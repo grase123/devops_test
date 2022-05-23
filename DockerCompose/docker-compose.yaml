@@ -1,0 +1,44 @@
+version: '3.7'
+services:
+
+  webapp:
+    image: myservice:1.0
+    build:
+      context: ../src
+      dockerfile: ../Dockerfiles/Dockerfile
+      args:
+        - SERVICE_NAME=hello_serv
+    environment:
+      - REDIS_ADDR=redis:6379
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:6.2-alpine
+    #restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --save 5 1 --loglevel warning
+    volumes: 
+      #- cache:/data
+      - "./data:/data:rw"
+
+  redis-exporter:
+    image: oliver006/redis_exporter
+    ports:
+      - 9121:9121
+    environment:
+      - REDIS_ADDR=redis:6379
+
+volumes:
+  cache: 
+    driver: local
+
+networks:
+  default:
+    external:
+      name: monitor_net
+
