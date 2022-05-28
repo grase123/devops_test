@@ -59,6 +59,7 @@ app_test:                 ## build webapp and run app localy without container
 	@echo "Start webapp: ./app/$(SERVICE_NAME)" && \
 	./app/$(SERVICE_NAME)
 
+
  ##  
  ## ---------------------- docker commands:
  ## 
@@ -98,6 +99,24 @@ docker_network_delete:    ## delete network for monitoring
 	@docker network rm monitor_net >/dev/null 2>/dev/null \
 		&& printf "deleted\n" \
 		|| printf "skipped, 'monitor_net' is still in use\n" 
+	@printf "\n"
+
+
+.PHONY: docker_app_image_remove
+docker_app_image_remove:    ## delete webapp image 
+	@printf "\n>> delete webapp image $(CONTAINER_NAME): "
+	@docker rmi $(shell docker images -aq $(CONTAINER_NAME)) >/dev/null 2>/dev/null \
+		&& printf "==> deleted\n" \
+		|| printf "==> skipped, there is nothing to delete or image is in use\n" 
+	@printf "\n"
+
+
+.PHONY: docker_remove_images
+docker_remove_images:    ## delete all unused images 
+	@printf "\n>> delete all unused images: "
+	@docker rmi $(shell docker images -aq) >/dev/null 2>/dev/null \
+		&& printf "==> images deleted\n" \
+		|| printf "==> skipped, there is nothing to delete\n" 
 	@printf "\n"
 
 
